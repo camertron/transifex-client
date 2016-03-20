@@ -13,16 +13,27 @@ module Transifex
     end
 
     def get(path, params = {})
-      response = connection.get(build_path(:v2, path), params)
-      response.body
+      make_request(:get, path, params)
     end
 
     def post(path, params = {})
-      response = connection.post(build_path(:v2, path), params)
-      response.body
+      make_request(:post, path, params)
+    end
+
+    def put(path, params = {})
+      make_request(:put, path, params)
+    end
+
+    def delete(path, params = {})
+      make_request(:delete, path, params)
     end
 
     private
+
+    def make_request(verb, path, params = {})
+      response = connection.send(verb, build_path(:v2, path), params)
+      response.body
+    end
 
     def build_path(version, path)
       "/api/2/#{path}"
