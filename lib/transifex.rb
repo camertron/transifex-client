@@ -1,4 +1,5 @@
 module Transifex
+  autoload :Categories, 'transifex/categories'
   autoload :Client,     'transifex/client'
   autoload :Config,     'transifex/config'
   autoload :HttpError,  'transifex/http_error'
