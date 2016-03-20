@@ -49,17 +49,17 @@ module Transifex
       }
 
       Faraday.new(options) do |builder|
+        builder.use Transifex::Middleware::RaiseHttpErrors
         builder.use FaradayMiddleware::Mashify
         builder.use Faraday::Response::ParseJson, content_type: /\bjson$/
-        builder.use Transifex::Middleware::RaiseHttpErrors
-        builder.use(FaradayMiddleware::FollowRedirects)
+        builder.use FaradayMiddleware::FollowRedirects
 
         # Authentiation
         builder.basic_auth(username, password)
 
-        # Request Middleware
-        builder.use Faraday::Request::Multipart
-        builder.use Faraday::Request::UrlEncoded
+        builder.request :multipart
+        builder.request :json
+        builder.request :url_encoded
 
         builder.adapter :net_http
       end
