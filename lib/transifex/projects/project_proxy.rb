@@ -11,7 +11,7 @@ module Transifex
 
       def fetch
         @project ||= Project.new(
-          client.get("/project/#{project_slug}/")
+          client.get(url)
         )
       end
 
@@ -24,6 +24,10 @@ module Transifex
       end
 
       private
+
+      def url
+        @url ||= "project/#{project_slug}/"
+      end
 
       def reset
         @project = nil
