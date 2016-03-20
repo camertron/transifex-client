@@ -17,11 +17,23 @@ module Transifex
       end
 
       def create(attributes)
-        Resources::Persistence.new(client, attributes).create
+        persistence = Resources::Persistence.new(
+          client, attributes.merge(
+            project_slug: project_slug
+          )
+        )
+
+        persistence.create
       end
 
       def create_or_update(attributes)
-        Resources::Persistence.new(client, attributes).create_or_update
+        persistence = Resources::Persistence.new(
+          client, attributes.merge(
+            project_slug: project_slug
+          )
+        )
+
+        persistence.create_or_update
       end
 
       private

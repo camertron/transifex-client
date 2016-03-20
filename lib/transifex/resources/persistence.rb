@@ -3,8 +3,6 @@ require 'stringio'
 module Transifex
   module Resources
     class Persistence
-      attr_reader :client, :attributes
-
       module ClassMethods
         def create(client, attributes)
           Resources::Persistence.new(client, attributes).create
@@ -17,7 +15,10 @@ module Transifex
 
       extend ClassMethods
 
+      attr_reader :project_slug, :client, :attributes
+
       def initialize(client, attributes)
+        @project_slug = attributes.delete(:project_slug)
         @client = client
         @attributes = attributes
       end
@@ -37,15 +38,14 @@ module Transifex
       end
 
       def create
-        payload = {
-          slug: resource_slug,
-          name: source_file,
-          i18n_type: attributes.fetch(:type),
-          categories: CategorySupport.join_categories(categories),
-          content: content_io
-        }
+        payload = attributes.merge(
+          content: content_io,
+          categories: Categories.load(
+            attributes.fetch(:categories, {})
+          ).to_s
+        )
 
-        url = "#{API_ROOT}/project/#{project_slug}/resources/"
+        url = "project/#{project_slug}/resources/"
         client.post(url, payload)
         Resource.new(project_slug, payload)
       end
@@ -54,49 +54,36 @@ module Transifex
 
       def update_content
         payload = { content: content_io }
-        url = "#{API_ROOT}/project/#{project_slug}/resource/#{resource_slug}/content/"
+        url = "project/#{project_slug}/resource/#{slug}/content/"
         client.put(url, payload)
       end
 
       def update_details
-        url = "#{API_ROOT}/project/#{project_slug}/resource/#{resource_slug}/"
-        client.put(url, details)
+        categories = Categories.load(
+          attributes.fetch(:categories, {})
+        )
+
+        payload = attributes.dup
+        payload[:categories] = categories.to_a unless categories.empty?
+
+        url = "project/#{project_slug}/resource/#{slug}/"
+        client.put(url, payload)
       end
 
-      def project_slug
-        attributes.fetch(:project_slug)
-      end
-
-      def resource_slug
-        attributes.fetch(:resource_slug)
+      def slug
+        attributes.fetch(:slug)
       end
 
       def content
-        attributes.fetch(:content)
-      end
-
-      def type
-        attributes.fetch(:type)
+        attributes.fetch(:content, nil)
       end
 
       def has_content?
         !!content
       end
 
-      def source_file
-        attributes.fetch(:source_file)
-      end
-
       def resource
-        client.project(project_slug).resource(resource_slug)
-      end
-
-      def categories
-        @categories ||= begin
-          new_categories = attributes.fetch(:categories, [])
-          old_categories = Set.new(resource.categories)
-          old_categories.merge(new_categories).to_a
-        end
+        client.project(project_slug).resource(slug)
       end
 
       def content_io
@@ -104,7 +91,7 @@ module Transifex
         io.set_encoding(Encoding::UTF_8.name)
 
         Faraday::UploadIO.new(
-          io, 'application/octet-stream', source_file
+          io, 'application/octet-stream'
         )
       end
     end
