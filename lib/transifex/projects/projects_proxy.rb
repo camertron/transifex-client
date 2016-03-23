@@ -13,6 +13,14 @@ module Transifex
         end
       end
 
+      def create(attributes)
+        Projects::Persistence.new(client, attributes).create
+      end
+
+      def create_or_update(attributes)
+        Projects::Persistence.new(client, attributes).create_or_update
+      end
+
       private
 
       def reset

@@ -14,7 +14,7 @@ module Transifex
     end
 
     def projects
-      Projects::ProjectProxy.new(self)
+      Projects::ProjectsProxy.new(self)
     end
   end
 end

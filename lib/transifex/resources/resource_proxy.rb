@@ -16,7 +16,7 @@ module Transifex
       def exists?
         fetch
         true
-      rescue Transifex::Error
+      rescue Transifex::HttpError
         false
       end
 

@@ -1,4 +1,5 @@
 Gemfile.lock
 pkg/
 */.DS_Store
-tester.rb
+resource_tester.rb
+project_tester.rb

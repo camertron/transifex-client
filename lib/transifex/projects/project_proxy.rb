@@ -15,12 +15,33 @@ module Transifex
         )
       end
 
+      def exists?
+        fetch
+        true
+      rescue Transifex::HttpError
+        false
+      end
+
       def resources
         Resources::ResourcesProxy.new(client, project_slug)
       end
 
       def resource(resource_slug)
         Resources::ResourceProxy.new(client, project_slug, resource_slug)
+      end
+
+      def update(attributes)
+        persistence = Projects::Persistence.new(
+          client, attributes.merge(
+            slug: project_slug
+          )
+        )
+
+        persistence.update
+      end
+
+      def delete
+        client.delete(url)
       end
 
       private

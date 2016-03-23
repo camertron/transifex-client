@@ -2,7 +2,7 @@ $:.unshift File.join(File.dirname(__FILE__), 'lib')
 require 'transifex/version'
 
 Gem::Specification.new do |s|
-  s.name     = 'transifex'
+  s.name     = 'transifex-client'
   s.version  = ::Transifex::VERSION
   s.authors  = ['Cameron Dutro']
   s.email    = ['camertron@gmail.com']

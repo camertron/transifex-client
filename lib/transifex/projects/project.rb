@@ -6,6 +6,8 @@ module Transifex
 
       alias_method :project_slug, :slug
 
+      extend Projects::Persistence::ClassMethods
+
       def initialize(transifex_data)
         @name = transifex_data[:name]
         @description = transifex_data[:description]
